@@ -1,6 +1,7 @@
 // SerialIn
 void DoSerialIn() {
-  int incomingByte = 0;
+  //int incomingByte = 0;
+   int relayNum;
    PID &v_PID = lambda_PID;
    double p,i,d;
     double p_d =0.02;
@@ -117,11 +118,43 @@ void DoSerialIn() {
       break;   
     case 'e':
       TransitionEngine(ENGINE_GOV_TUNING);
-      break;  
+      break; 
+    case 'x':
+      testSD();
+      break;
+    case 'R': //R0; turns Relay 0 on.
+      relayNum = SerialReadInt();
+      if (relayNum >= 0 and relayNum <8){
+        relayOn(relayNum);
+        Serial.print("#Setting relay "); Serial.print(relayNum); Serial.println(" on");
+      }
+      break;
+    case 'r': //
+      relayNum = SerialReadInt();
+      if (relayNum >= 0 and relayNum <8){
+        relayOn(relayNum);
+        Serial.print("#Setting relay "); Serial.print(relayNum); Serial.println(" off");
+      }
+      break;
     }
   }
-  
 }
+
+int SerialReadInt(){
+  byte incomingByte;
+  int integerValue = 0;  
+  while(1) {            
+    incomingByte = Serial.read();
+    if (incomingByte == '\n') break;   // exit the while(1), we're done receiving
+    if (incomingByte == ';') break;
+    if (incomingByte == -1) continue;  // if no characters are in the buffer read() returns -1
+    integerValue *= 10;  // shift left 1 decimal place
+    // convert ASCII to integer, add, and shift left 1 decimal place
+    integerValue = ((incomingByte - 48) + integerValue);
+  }
+  return integerValue;
+}
+    
 
 void PrintLambdaUpdate(double P, double I, double D, double nP, double nI, double nD) {
   Serial.print("#Updating PID from [");
