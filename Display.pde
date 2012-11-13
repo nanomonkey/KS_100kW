@@ -111,7 +111,7 @@ void DoDisplay() {
 //    }
     else {
       Disp_RC(3,0);
-      GetFuelFeedStates();
+      GetFuelFeedStates(); 
       display_string.toCharArray(buf, 11);
       Disp_PutStr(buf);
     }
@@ -459,12 +459,6 @@ void TransitionMessage(String t_message) {
 void GetFuelFeedStates(){  //CRBAGF    
   display_string = "";
     //Conveyor 
-  if(conveyor_state == CONVEYOR_OFF){
-    display_string += "-";
-  }
-  else {
-    display_string += "+";
-  }
   switch (conveyor_state) {
     case CONVEYOR_OFF:
       display_string += "-";
