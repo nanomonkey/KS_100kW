@@ -135,6 +135,8 @@ unsigned long ash_on = 0;
 #define DISPLAY_LAMBDA 4
 #define DISPLAY_GRATE 5
 #define DISPLAY_TESTING 6
+#define DISPLAY_SERVO 7
+
 String display_string = "";
 
 //Testing States
@@ -152,6 +154,7 @@ String display_string = "";
 #define TESTING_ANA_FUEL_SWITCH 11
 #define TESTING_ANA_POT1 12
 #define TESTING_ANA_POT2 13
+#define TESTING_SERVO 14
 
 //Test Variables
 int testing_state = TESTING_OFF;
@@ -294,6 +297,7 @@ int lambda_state;
 unsigned long lambda_state_entered;
 
 //Governor
+byte servo_min,servo_max;
 double throttle_valve_open = 123; //calibrated angle for servo valve open
 double throttle_valve_closed = 48; //calibrated angle for servo valve closed (must be smaller value than open)
 double governor_setpoint;
@@ -482,6 +486,7 @@ void setup() {
   //LoadLambda(); - must save lambda data first?
   Serial.begin(57600);
   InitSD();
+  LoadServo();
 
   Disp_Init();
   Kpd_Init();
@@ -522,41 +527,48 @@ void setup() {
 void loop() {
   if (millis() >= nextTime3) {
     nextTime3 += loopPeriod3;
-    // first, read all KS's sensors
-    Temp_ReadAll();  // reads into array Temp_Data[], in deg C
-    Press_ReadAll(); // reads into array Press_Data[], in hPa
-    Timer_ReadAll(); // reads pulse timer into Timer_Data, in RPM ??? XXX
-    DoPressure();
-    DoSerialIn();
-    DoLambda();
-    //DoGovernor();
-    DoAuger();
-    DoRotaryValve();
-    DoConveyor();
-    DoEngine();
-    DoGrate();
-    DoAshOut();
-    DoAshGrate();
-    DoHopperAgitator();
-    //DoServos();
-    DoFlare();
-    DoReactor();
+    if (testing_state == TESTING_OFF) {
+      // first, read all KS's sensors
+      Temp_ReadAll();  // reads into array Temp_Data[], in deg C
+      Press_ReadAll(); // reads into array Press_Data[], in hPa
+      Timer_ReadAll(); // reads pulse timer into Timer_Data, in RPM ??? XXX
+      DoPressure();
+      DoSerialIn();
+      DoLambda();
+      //DoGovernor();
+      DoAuger();
+      DoRotaryValve();
+      DoConveyor();
+      DoEngine();
+      DoGrate();
+      DoAshOut();
+      DoAshGrate();
+      DoHopperAgitator();
+      //DoServos();
+      DoFlare();
+      DoReactor();
+      DoControlInputs();
+      DoDriveReset(); //reset drive commands to correctly drive AC motors
+      //TODO: Add OpenEnergyMonitor Library
+    }
     DoKeyInput();
     DoHeartBeat(); // blink heartbeat LED
-    DoControlInputs();
-    DoDriveReset(); //reset drive commands to correctly drive AC motors
-    //TODO: Add OpenEnergyMonitor Library
+
     if (millis() >= nextTime2) {
       nextTime2 += loopPeriod2;
       DoDisplay();
       if (millis() >= nextTime1) {
         nextTime1 += loopPeriod1;
-        DoFilter();
-        DoDatalogging();
-        DoAlarmUpdate();
+        if (testing_state == TESTING_OFF) {
+          DoFilter();
+          DoDatalogging();
+          DoAlarmUpdate();
+        }
         if (millis() >= nextTime0) {
-          nextTime0 += loopPeriod0;
-          DoAlarm();
+          if (testing_state == TESTING_OFF) {
+            nextTime0 += loopPeriod0;
+            DoAlarm();
+          }
         }
       }
     }

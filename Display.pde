@@ -1,6 +1,7 @@
 void DoDisplay() {
   boolean disp_alt; // Var for alternating value display
   char buf[20];
+  char menu1[] = "NEXT  ADV   +    -  ";
   if (millis() % 2000 > 1000) {
     disp_alt = false;
   } 
@@ -365,6 +366,53 @@ void DoDisplay() {
     }
 
     break;
+      case DISPLAY_SERVO:   //need to add constraints for min and max?
+    item_count = 2;
+    testing_state = TESTING_SERVO;  //necessary so that there isn't any conflicting servo writes
+    Disp_RC(0,0);
+    sprintf(buf, "ServoMin%3i", int(throttle_valve_closed));
+    Disp_PutStr(buf);
+    Disp_RC(0,11);
+    sprintf(buf, " Max %3i", int(throttle_valve_open));
+    Disp_PutStr(buf);
+    //Row 1
+    Disp_RC(1,0);
+    Disp_PutStr(" Careful of Sides!  "); 
+    Disp_RC(2,0);
+    Disp_PutStr("                    ");
+    switch (cur_item) {
+    case 1: // Servo Min
+      Servo_Mixture.write(throttle_valve_closed);
+      if (key == 2) {
+        if (throttle_valve_closed + 1 < throttle_valve_open){
+          throttle_valve_closed += 1;
+        }
+      }
+      if (key == 3) {
+        throttle_valve_closed -= 1;
+      }
+      Disp_RC(3,0);
+      Disp_PutStr(menu1);
+      Disp_RC(0,0);
+      Disp_CursOn();
+      break;
+    case 2: //Servo Max 
+      Servo_Mixture.write(throttle_valve_open);
+      if (key == 2) {
+        throttle_valve_open += 1;
+      }
+      if (key == 3) {
+        if (throttle_valve_open - 1 > throttle_valve_closed) {
+          throttle_valve_open -= 1;
+        }
+      }
+      Disp_RC(3,0);
+      Disp_PutStr(menu1);
+      Disp_RC(0,11);
+      Disp_CursOn();
+      break;
+    }
+    break;
     //    case DISPLAY_TEMP2:
     //      break;
     //    case DISPLAY_FETS:
@@ -390,6 +438,9 @@ void TransitionDisplay(int new_state) {
     cur_item = 1;
     break;
   case DISPLAY_TESTING:
+    cur_item = 1;
+    break;
+  case DISPLAY_SERVO:
     cur_item = 1;
     break;
   }
@@ -425,7 +476,16 @@ void DoKeyInput() {
       }
       break;
     case DISPLAY_TESTING:
+      if (engine_state == ENGINE_OFF){
+        TransitionDisplay(DISPLAY_SERVO);
+      } else {
       TransitionDisplay(DISPLAY_REACTOR);
+      TransitionTesting(TESTING_OFF);
+      }
+      break;
+    case DISPLAY_SERVO:
+      WriteServo();
+      TransitionDisplay(DISPLAY_REACTOR);  //assume that engine state is off because we are already in DISPLAY_SERVO
       TransitionTesting(TESTING_OFF);
       break;
     }

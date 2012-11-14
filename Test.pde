@@ -1,12 +1,3 @@
-void DoTesting() {
-  while (testing_state != TESTING_OFF) {
-    //run seperate closed loop while in testing mode, taking all processor cycles
-    DoDisplay();
-    DoKeyInput();
-    DoHeartBeat();
-  }
-}
-
 void TransitionTesting(int new_state) {
   testing_state_entered = millis();
   Serial.print("#Switching to testing state:");
@@ -112,7 +103,6 @@ void GoToNextTestingState() {
   switch (testing_state) {
   case TESTING_OFF:
     TransitionTesting(TESTING_FET0);
-    DoTesting();
     break;
   case TESTING_FET0:
     TransitionTesting(TESTING_FET1);
