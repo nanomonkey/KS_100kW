@@ -17,6 +17,7 @@
 #include <util.h>           // part of KSlibs, utility functions, GCU_Setup
 #include <avr/io.h>         // advanced: provides port definitions for the microcontroller (ATmega1280, http://www.atmel.com/dyn/resources/prod_documents/doc2549.PDF)   
 #include <SD.h>
+#include <Canbus.h>
 
 //constant definitions
 #define ABSENT -500
@@ -450,6 +451,10 @@ int sd_index=0;
 //Datalogging Buffer
 String data_buffer = "";
 char float_buf[15] = "";
+
+//CANbus 
+char can_data_file_name[] = "can00001.txt";
+boolean can_init = false; 
 
 void setup() {
   GCU_Setup(V3,FULLFILL,P777722);

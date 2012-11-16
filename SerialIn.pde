@@ -124,17 +124,20 @@ void DoSerialIn() {
       break;
     case 'R': //R0; turns Relay 0 on.
       relayNum = SerialReadInt();
-      if (relayNum >= 0 and relayNum <8){
+      if (relayNum >= 0 and relayNum < 8){
         relayOn(relayNum);
         Serial.print("#Setting relay "); Serial.print(relayNum); Serial.println(" on");
       }
       break;
-    case 'r': //
+    case 'r': //r0; turns Relay 0 off.
       relayNum = SerialReadInt();
-      if (relayNum >= 0 and relayNum <8){
+      if (relayNum >= 0 and relayNum < 8){
         relayOn(relayNum);
         Serial.print("#Setting relay "); Serial.print(relayNum); Serial.println(" off");
       }
+      break;
+    case 'C':
+      logCANbus();
       break;
     }
   }
