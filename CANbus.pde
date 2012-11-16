@@ -1,23 +1,3 @@
-/*CANbus PINs
-update defaults.h in CANbus library to these values:
-
-#define	P_MOSI	J,1
-#define	P_MISO	J,0
-#define	P_SCK	J,2
-#define	MCP2515_CS	H,2 
-#define	MCP2515_INT	J,6
-
-Unknown:
-#define LED2_HIGH			B,0
-#define LED2_LOW			B,0
-
-see 
-http://arduino.cc/forum/index.php/topic,8730.0.html# 
-http://tucrrc.utulsa.edu/Publications/Arduino/arduino.html
-for more info and perhaps a different library
-*/
-
-
 
 void InitCAN(){
   if(Canbus.init(CANSPEED_500)){  //in kbps: CANSPEED_125 CANSPEED_250 CANSPEED_500
@@ -49,8 +29,19 @@ void logCANbus(){
     Serial.print("#O2 Voltage: "); Serial.println(buffer);
   }   
   if (Canbus.ecu_req(0xFEB3,buffer) == 1){   //Request for PGN 65203 - .05 L/hour trip fuel rate
-    Serial.print("PGN 65203, .05 L/hour trip fuel rate: "); Serial.println(buffer);
+    Serial.print("#PGN 65203: "); Serial.println(buffer);
   }
+  if (Canbus.ecu_req(0xF004,buffer) == 1){   
+    Serial.print("#PGN 61444: "); Serial.println(buffer);
+  }
+  if (Canbus.ecu_req(0xFEE9,buffer) == 1){   
+    Serial.print("#PGN 65257: "); Serial.println(buffer);
+  }
+  /*
+ Engine Speed is in PGN 61444(0xF004).  It is two bytes long with a resolution of .125 rpm/bit, bytes 4 and 5. Byte 3 of that PGN is the percent engine torque of the engine.
+ PGN 65203(0xFEB3) has a parameter called trip fuel rate in .05 L/hour. It is the fifth and sixth bytes.  
+ PGN 65257(0xFEE9) has two separate parameters total fuel consumption and trip fuel consumption both are .5L/ bit.  Trip fuel consumption is bytes 1-4 and Total Fuel Consumption is bytes 5-8.  
+*/
 }
 
 //void sendCANbus(&message, boolean J1939){
