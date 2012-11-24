@@ -1,6 +1,7 @@
 void DoDisplay() {
   boolean disp_alt; // Var for alternating value display
   char buf[20];
+  char choice[5] = "    ";
   char menu1[] = "NEXT  ADV   +    -  ";
   if (millis() % 2000 > 1000) {
     disp_alt = false;
@@ -366,7 +367,7 @@ void DoDisplay() {
     }
 
     break;
-      case DISPLAY_SERVO:   //need to add constraints for min and max?
+    case DISPLAY_SERVO:   //need to add constraints for min and max?
     item_count = 2;
     testing_state = TESTING_SERVO;  //necessary so that there isn't any conflicting servo writes
     Disp_RC(0,0);
@@ -413,6 +414,82 @@ void DoDisplay() {
       break;
     }
     break;
+  case DISPLAY_CONFIG:
+    Disp_CursOff();
+    item_count = sizeof(Config_Choices)/sizeof(Config_Choices[0]);
+    if (config_changed == false){
+      config_var = getConfig(cur_item);
+    }
+    if (config_var == 255){  //EEPROM default state, not a valid choice.  Loops choice back to zero.
+      config_var = 0;
+    }
+    if (config_var == -1){  //keeps values from being negative
+      config_var = 254;
+    }
+    Disp_RC(0,0);
+    Disp_PutStr("   Configurations   ");
+    Disp_RC(1,0);
+    if (Config_Choices[cur_item-1] == "+    -  "){
+      sprintf(buf, "%s:%3i", Configuration[cur_item-1], config_var);
+    } else if (Config_Choices[cur_item-1] == "+5   -5 "){
+      sprintf(buf, "%s:%3i", Configuration[cur_item-1], 5*config_var);
+    } else {
+      if (config_var == 0){
+      choice[0] = Config_Choices[cur_item-1][0];
+      choice[1] = Config_Choices[cur_item-1][1];
+      choice[2] = Config_Choices[cur_item-1][2];
+      choice[3] = Config_Choices[cur_item-1][3];
+      } else {
+        choice[0] = Config_Choices[cur_item-1][4];
+        choice[1] = Config_Choices[cur_item-1][5];
+        choice[2] = Config_Choices[cur_item-1][6];
+        choice[3] = Config_Choices[cur_item-1][7];
+      }
+      sprintf(buf, "%s:%s", Configuration[cur_item-1], choice);
+    }
+    Disp_PutStr(buf);
+    Disp_RC(2,0);
+    Disp_PutStr("ADV to save choice  ");
+    Disp_RC(3,0);
+    sprintf(buf, "NEXT  ADV   %s", Config_Choices[cur_item-1]);
+    Disp_PutStr(buf);
+    if (Config_Choices[cur_item-1] == "+    -  "){
+      if (key == 2) {
+        if (config_max[cur_item-1] >= config_var + 1){
+          config_var += 1;
+          config_changed = true;
+        }
+      }
+      if (key == 3) {
+        if (config_min[cur_item-1] <= config_var - 1){
+          config_var -= 1;
+          config_changed = true;
+        }
+      } 
+    } else if (Config_Choices[cur_item-1] == "+5   -5 "){
+      if (key == 2) {
+        if (config_max[cur_item-1] >= config_var + 1){
+          config_var += 1;
+          config_changed = true;
+        }
+      }
+      if (key == 3) {
+        if (config_min[cur_item-1] <= config_var - 1){
+          config_var -= 1;
+          config_changed = true;
+        }
+      }
+    } else {
+      if (key == 2) {  
+        config_var = 0;
+        config_changed = true;
+      }
+      if (key == 3) {
+        config_var = 1;
+        config_changed = true;
+      }
+    }
+    break;  
     //    case DISPLAY_TEMP2:
     //      break;
     //    case DISPLAY_FETS:
@@ -442,6 +519,10 @@ void TransitionDisplay(int new_state) {
     break;
   case DISPLAY_SERVO:
     cur_item = 1;
+    break;
+  case DISPLAY_CONFIG: 
+    cur_item = 1;
+    config_changed = false;
     break;
   }
   display_state=new_state;
@@ -485,8 +566,11 @@ void DoKeyInput() {
       break;
     case DISPLAY_SERVO:
       WriteServo();
-      TransitionDisplay(DISPLAY_REACTOR);  //assume that engine state is off because we are already in DISPLAY_SERVO
       TransitionTesting(TESTING_OFF);
+      TransitionDisplay(DISPLAY_CONFIG);  //assume that engine state is off because we are already in DISPLAY_SERVO
+      break;
+    case DISPLAY_CONFIG:
+      TransitionDisplay(DISPLAY_REACTOR);
       break;
     }
     key = -1; //key caught
@@ -615,3 +699,48 @@ void GetFuelFeedStates(){  //CRBAGF
   display_string += "   ";
 }
 
+
+void saveConfig(int item, int state){  //EEPROM:  0-499 for internal states, 500-999 for configurable states, 1000-4000 for data logging configurations.
+  int old_state = EEPROM.read(499+item);
+  if(state != old_state){
+    EEPROM.write(499+item, state);
+    delay(5); //ensure that value is not read until EERPROM has been fully written (~3.3ms)
+  }
+}
+
+int getConfig(int item){
+  int value;
+  value = int(EEPROM.read(499+item));
+  if (value == 255){  //values hasn't been saved yet to EEPROM, go with default value saved in defaults[]
+    value = defaults[item-1];
+    EEPROM.write(499+item, value);
+  }
+  config_changed = true;
+  return value;
+}
+
+void update_config_var(int var_num){
+  switch (var_num) {
+    case 1:
+      CANbus_speed = getConfig(1); 
+      break;
+    case 2:
+      PR_LOW_boundary = getConfig(2)/100.0;
+      //float pRatioReactorLevelBoundary[3][2] = {{PR_HIGH_boundary, 1.0}, {PR_LOW_boundary, 0.6 }, {0.0, PR_LOW_boundary} }; 
+      //PR_HIGH = 0, PR_CORRECT = 1, PR_LOW = 2
+      pRatioReactorLevelBoundary[PR_CORRECT][0] = PR_LOW_boundary;
+      pRatioReactorLevelBoundary[PR_LOW][1] = PR_LOW_boundary;
+      break;
+    case 3:
+      PR_HIGH_boundary = getConfig(3)/100.0;
+      pRatioReactorLevelBoundary[PR_HIGH][0] = PR_HIGH_boundary;
+      break;
+  }
+}
+
+void resetConfig() {  //sets EEPROM configs back to untouched state...
+  int default_count = sizeof(defaults)/sizeof(int);
+  for (int i=0; i < default_count; i++){
+    EEPROM.write(500+i, defaults[i]);
+  }
+}

@@ -137,6 +137,7 @@ unsigned long ash_on = 0;
 #define DISPLAY_GRATE 5
 #define DISPLAY_TESTING 6
 #define DISPLAY_SERVO 7
+#define DISPLAY_CONFIG 8
 
 String display_string = "";
 
@@ -156,6 +157,20 @@ String display_string = "";
 #define TESTING_ANA_POT1 12
 #define TESTING_ANA_POT2 13
 #define TESTING_SERVO 14
+
+//Configuration Variables
+int config_var;
+byte config_changed = false;
+static char *Configuration[] = { "CANbus speed   ", "PR_LOW (.01)   ", "PR_HIGH (.01)  " };  //15 character Display prompt
+static char *Config_Choices[] = {"+5   -5 ","+1  -1  ","+1  -1  "}; //8 char options for last two buttons
+int defaults[] = {100,90,30};  //default values to be saved to EEPROM for the following getConfig variables
+int config_min[] = {0,70, 9};  //minimum values allowed 
+int config_max[] = {254,99, 69}; //maximum values allowed  
+
+//Don't forget to add the following to update_config_var in Display!
+int CANbus_speed = 5*getConfig(1); 
+float PR_LOW_boundary = getConfig(2)/100.0;
+float PR_HIGH_boundary = getConfig(3)/100.0;
 
 //Test Variables
 int testing_state = TESTING_OFF;
@@ -186,7 +201,8 @@ int PULSE=100;
 float pRatioReactor;
 enum pRatioReactorLevels { PR_HIGH = 0, PR_CORRECT = 1, PR_LOW = 2} pRatioReactorLevel;
 static char *pRatioReactorLevelName[] = { "High", "Correct","Low" };
-float pRatioReactorLevelBoundary[3][2] = { { 0.9, 1.0 }, { 0.3, 0.6 }, {0.0, 0.3} };
+//float pRatioReactorLevelBoundary[3][2] = { { 0.9, 1.0 }, { 0.3, 0.6 }, {0.0, 0.3} };
+float pRatioReactorLevelBoundary[3][2] = {{PR_HIGH_boundary, 1.0}, {PR_LOW_boundary, 0.6 }, {0.0, PR_LOW_boundary} };
 
 // Filter pressure ratio
 float pRatioFilter;
