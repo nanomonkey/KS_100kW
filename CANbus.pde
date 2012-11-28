@@ -1,12 +1,22 @@
 
 void InitCAN(){
-  if(Canbus.init(CANSPEED_500)){  //in kbps: CANSPEED_125 CANSPEED_250 CANSPEED_500
+  if(Canbus.init(CANSPEED_250)){  //in kbps: CANSPEED_125 CANSPEED_250 CANSPEED_500
+  //if(Canbus.init(CANbus_speed)) {
     Serial.println("CAN Init ok");
     can_init = true;
   } else {
       Serial.println("Can't init CAN");
       can_init = false;
-  } 
+  }
+//  Serial.print("CANSPEED 250: "); Serial.println(CANSPEED_250);
+//  
+//  if(mcp2515_init(CANSPEED_250)){
+//    Serial.println("CAN Init ok");
+//    can_init = true;
+//  } else {
+//      Serial.println("Can't init CAN");
+//      can_init = false;
+//  }
 }
 
 void logCANbus(){

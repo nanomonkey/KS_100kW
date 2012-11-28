@@ -17,12 +17,17 @@
 #include <util.h>           // part of KSlibs, utility functions, GCU_Setup
 #include <avr/io.h>         // advanced: provides port definitions for the microcontroller (ATmega1280, http://www.atmel.com/dyn/resources/prod_documents/doc2549.PDF)   
 #include <SD.h>
+
 #include <Canbus.h>
+#include <defaults.h>
+#include <global.h>
+#include <mcp2515.h>
+#include <mcp2515_defs.h>
 
 //constant definitions
 #define ABSENT -500
 
-#define CODE_VERSION "100kW v1.00"
+#define CODE_VERSION "100kW v1.01"
 
 // Analog Input Mapping
 #define ANA_EO2 ANA0
@@ -507,6 +512,7 @@ void setup() {
   //LoadLambda(); - must save lambda data first?
   Serial.begin(57600);
   InitSD();
+  
   LoadServo();
 
   Disp_Init();
@@ -543,6 +549,7 @@ void setup() {
   TransitionRotaryValve(ROTARYVALVE_OFF);
   TransitionConveyor(CONVEYOR_OFF);
   
+  //InitCAN();
 }
 
 void loop() {
