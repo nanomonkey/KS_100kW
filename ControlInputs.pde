@@ -74,6 +74,6 @@ void ReadPot1(){
 }
 
 void ReadPot2(){
-  pressure_setpoint = map(analogRead(ANA_POT2), 0, 1023, 0.0, 5.0);
+  pressure_setpoint = map(analogRead(ANA_POT2), 0, 1023, -1250, 0);
   air_butterfly_position = map(analogRead(ANA_POT2), 0, 1023, throttle_valve_closed, throttle_valve_open);     // read value of potentiometer (between 0 and 1023) scale it to use it with the servo between throttle_valve_open, throttle_valve_closed
 }

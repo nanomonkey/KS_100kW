@@ -270,6 +270,80 @@ void DoDisplay() {
       break;
     }
     break;
+    //Pressure PID:
+  case DISPLAY_PRESSURE_PID:
+    double pP,pI;
+    item_count = 4;
+    pP=pressure_PID.GetP_Param();
+    pI=pressure_PID.GetI_Param();
+    Disp_RC(0,0);
+    sprintf(buf, "PcomSet%3i", int(ceil(pressure_setpoint*100.0)));
+    Disp_PutStr(buf);
+    Disp_RC(0,11);
+    sprintf(buf, "Pcomb%3i", int(pressure_input*100.0));
+    Disp_PutStr(buf);
+    //Row 1
+    Disp_RC(1,0);
+    sprintf(buf, "P     %3i  ", int(ceil(pressure_PID.GetP_Param()*100.0)));
+    Disp_PutStr(buf);
+    Disp_RC(1,11);
+    sprintf(buf, "I     %3i", int(ceil(pressure_PID.GetI_Param()*100.0)));
+    Disp_PutStr(buf);
+    Disp_RC(2,0);
+    Disp_PutStr("                    ");
+    switch (cur_item) {
+    case 1: // Pressure_PID setpoint
+      if (key == 2) {
+        pressure_setpoint += 0.01;
+        WritePressurePID();
+      }
+      if (key == 3) {
+        pressure_setpoint -= 0.01;
+        WritePressurePID();
+      }          
+      Disp_RC(0,0);
+      Disp_CursOn();
+      Disp_RC(3,0);
+      Disp_PutStr("NEXT  ADV   +    -  ");
+      break;
+    case 2: //Pcomb reading
+      Disp_RC(3,0);
+      Disp_PutStr("NEXT  ADV           ");
+      Disp_RC(0,11);
+      Disp_CursOn();
+      break;
+    case 3: //Pressure_PID P
+      if (key == 2) {
+        pP += 0.01;
+        WritePressurePID();
+      }
+      if (key == 3) {
+        pP -= 0.01;
+        WritePressurePID();
+      }
+      pressure_PID.SetTunings(pP,pI,0);
+      Disp_RC(3,0);
+      Disp_PutStr("NEXT  ADV   +    -  ");
+      Disp_RC(1,0);
+      Disp_CursOn();
+      break;
+    case 4: //Pressure_PID I
+      if (key == 2) {
+        pI += 0.1;
+        WritePressurePID();
+      }
+      if (key == 3) {
+        pI -= 0.1;
+        WritePressurePID();
+      }
+      pressure_PID.SetTunings(pP,pI,0);
+      Disp_RC(3,0);
+      Disp_PutStr("NEXT  ADV   +    -  ");
+      Disp_RC(1,11);
+      Disp_CursOn();
+      break;
+    }
+    break;
   case DISPLAY_GRATE:
     int vmin,vmax;
     item_count = 4;
@@ -511,6 +585,9 @@ void TransitionDisplay(int new_state) {
   case DISPLAY_LAMBDA:
     cur_item = 1;
     break;
+  case DISPLAY_PRESSURE_PID:
+    cur_item = 1;
+    break;
   case DISPLAY_GRATE:
     cur_item = 1;
     break;
@@ -546,6 +623,9 @@ void DoKeyInput() {
       TransitionDisplay(DISPLAY_REACTOR);
       break;
     case DISPLAY_LAMBDA:
+      TransitionDisplay(DISPLAY_PRESSURE_PID);
+      break;
+    case DISPLAY_PRESSURE_PID:
       TransitionDisplay(DISPLAY_GRATE);
       break;
     case DISPLAY_GRATE:
@@ -734,6 +814,9 @@ void update_config_var(int var_num){
     case 3:
       PR_HIGH_boundary = getConfig(3)/100.0;
       pRatioReactorLevelBoundary[PR_HIGH][0] = PR_HIGH_boundary;
+      break;
+    case 4:
+      PID_Control = getConfig(4);
       break;
   }
 }

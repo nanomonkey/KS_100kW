@@ -140,10 +140,11 @@ unsigned long ash_on = 0;
 #define DISPLAY_ENGINE 2
 #define DISPLAY_TEST 3
 #define DISPLAY_LAMBDA 4
-#define DISPLAY_GRATE 5
-#define DISPLAY_TESTING 6
-#define DISPLAY_SERVO 7
-#define DISPLAY_CONFIG 8
+#define DISPLAY_PRESSURE_PID 5
+#define DISPLAY_GRATE 6
+#define DISPLAY_TESTING 7
+#define DISPLAY_SERVO 8
+#define DISPLAY_CONFIG 9
 
 String display_string = "";
 
@@ -167,16 +168,17 @@ String display_string = "";
 //Configuration Variables
 int config_var;
 byte config_changed = false;
-static char *Configuration[] = { "CANbus speed   ", "PR_LOW (.01)   ", "PR_HIGH (.01)  " };  //15 character Display prompt
-static char *Config_Choices[] = {"+5   -5 ","+1  -1  ","+1  -1  "}; //8 char options for last two buttons
-int defaults[] = {100,90,30};  //default values to be saved to EEPROM for the following getConfig variables
-int config_min[] = {0,70, 9};  //minimum values allowed 
-int config_max[] = {254,99, 69}; //maximum values allowed  
+static char *Configuration[] = { "CANbus speed   ", "PR_LOW (.01)   ", "PR_HIGH (.01)  ", "Servo Control  " };  //15 character Display prompt
+static char *Config_Choices[] = {"+5   -5 ","+1  -1  ","+1  -1  ", "POT PID "}; //8 char options for last two buttons
+int defaults[] = {100,90,30,0};  //default values to be saved to EEPROM for the following getConfig variables
+int config_min[] = {0,70, 9, 0};  //minimum values allowed 
+int config_max[] = {254,99, 69, 254}; //maximum values allowed  
 
 //Don't forget to add the following to update_config_var in Display!
 int CANbus_speed = 5*getConfig(1); 
 float PR_LOW_boundary = getConfig(2)/100.0;
 float PR_HIGH_boundary = getConfig(3)/100.0;
+int PID_Control = getConfig(4);
 
 //Test Variables
 int testing_state = TESTING_OFF;
@@ -298,6 +300,26 @@ int item_count,cur_item;
 //Keypad
 int key = -1;
 
+//Pressure PID
+byte servo_min,servo_max;
+double throttle_valve_open = 123; //calibrated angle for servo valve open
+double throttle_valve_closed = 48; //calibrated angle for servo valve closed (must be smaller value than open)
+double idle_setpoint;
+double pressure_setpoint;
+double pressure_input;
+double pressure_output;
+double pressure_value;
+double pressure_setpoint_mode[1] = {1.05};
+double pressure_P[1] = {0.13}; //Adjust P_Param to get more aggressive or conservative control, change sign if moving in the wrong direction
+double pressure_I[1] = {1.0}; //Make I_Param about the same as your manual response time (in Seconds)/4 
+double pressure_D[1] = {0.0}; //Unless you know what it's for, don't use D
+PID pressure_PID(&pressure_input, &pressure_output, &pressure_setpoint,pressure_P[0],pressure_I[0],pressure_D[0]);
+unsigned long pressure_updated_time;
+boolean write_pressure = false;
+String pressure_state_name;
+int pressure_state;
+unsigned long pressure_state_entered;
+
 // Lambda variables
 double premix_valve_open = 133; 
 double premix_valve_closed = 68;
@@ -320,9 +342,6 @@ int lambda_state;
 unsigned long lambda_state_entered;
 
 //Governor
-byte servo_min,servo_max;
-double throttle_valve_open = 123; //calibrated angle for servo valve open
-double throttle_valve_closed = 48; //calibrated angle for servo valve closed (must be smaller value than open)
 double governor_setpoint;
 double governor_input;
 double governor_output;
@@ -514,7 +533,6 @@ void setup() {
   //LoadLambda(); - must save lambda data first?
   Serial.begin(57600);
   InitSD();
-  
   LoadServo();
 
   Disp_Init();
