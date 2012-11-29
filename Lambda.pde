@@ -1,7 +1,12 @@
 // Lambda
 void InitLambda() {
   //LoadLambda();
-  lambda_state = LAMBDA_POT_CONTROL; //
+  if (PID_Control == 0){
+  lambda_state = LAMBDA_POT_CONTROL; 
+  } else {
+    LoadPressurePID();
+    lambda_state = LAMBDA_P_COMB;
+  }
 }
 
 void DoLambda() {
@@ -64,6 +69,11 @@ void DoLambda() {
       case LAMBDA_POT_CONTROL:
         Servo_Mixture.write(air_butterfly_position);
         break;
+      case LAMBDA_P_COMB:
+        pressure_input = Press[P_COMB];
+        pressure_PID.Compute();
+        Servo_Mixture.write(pressure_output);
+        break;
      }
 }
 
@@ -81,6 +91,8 @@ void TransitionLambda(int new_state) {
        loopPeriod1 = loopPeriod1*4; //return to normal datalogging rate
        break;
      case LAMBDA_POT_CONTROL:
+       break;
+     case LAMBDA_P_COMB:
        break;
    }
   Serial.print("# Lambda switching from ");
@@ -115,6 +127,14 @@ void TransitionLambda(int new_state) {
       lambda_PID.SetMode(AUTO);
       lambda_setpoint = random(8,12)/10.0; //steps in random 10% increments of control output limits
       loopPeriod1 = loopPeriod1/4; //fast datalogging
+      break;
+    case LAMBDA_P_COMB:
+      lambda_state_name = "Combustion Pressure Setpoint";
+      pressure_PID.SetMode(AUTO);
+      //pressure_PID.SetInputLimits(0.0, 5.0);
+      pressure_PID.SetOutputLimits(throttle_valve_closed,throttle_valve_open);
+      pressure_PID.SetTunings(pressure_P[0], pressure_I[0], pressure_D[0]);
+      //SetPremixServoAngle(
       break;
   }
   Serial.print(" to ");  
@@ -171,4 +191,43 @@ void LoadLambda() {
   }
   lambda_setpoint = val;
   lambda_setpoint_mode[0] = val;
+}
+
+
+//PressurePID 
+void WritePressurePID() {
+  WritePressurePID(lambda_setpoint);
+}
+
+void WritePressurePID(double setpoint) {
+  int val,p,i;
+  p = constrain(pressure_PID.GetP_Param()*100,0,255);
+  i = constrain(pressure_PID.GetI_Param()*10,0,255);
+  pressure_setpoint_mode[0] = setpoint;
+  val = constrain(128+(setpoint-1.0)*100,0,255);
+  EEPROM.write(112,128); //check point
+  EEPROM.write(113, val);
+  EEPROM.write(114, p);
+  EEPROM.write(115, i);
+  Serial.println("#Writing pressure_pid settings to EEPROM");
+}
+
+void LoadPressurePID() {
+  byte check;
+  double val,p,i;
+  check = EEPROM.read(112); 
+  val = 1.0+(EEPROM.read(113)-128)*0.01;
+  p = EEPROM.read(114)*0.01;
+  i = EEPROM.read(115)*0.1;
+  if (check == 128 && val >= 0.5 && val <= 1.5) { //check to see if lambda has been set
+    Serial.println("#Loading lambda from EEPROM");
+    pressure_setpoint = val;
+    pressure_PID.SetTunings(p,i,0);
+  } else {
+    Serial.println("#Saving default lambda setpoint to EEPROM");
+    val = pressure_setpoint_mode[0];
+    WritePressurePID(val);
+  }
+  pressure_setpoint = val;
+  pressure_setpoint_mode[0] = val;
 }
