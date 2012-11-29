@@ -132,6 +132,7 @@ unsigned long ash_on = 0;
 #define LAMBDA_STEPTEST 2
 #define LAMBDA_SPSTEPTEST 3
 #define LAMBDA_POT_CONTROL 4
+#define LAMBDA_P_COMB 5
 
 //Display States
 #define DISPLAY_SPLASH 0
@@ -340,6 +341,7 @@ char serial_last_input = '\0'; // \0 is the ABSENT character
 
 //Air Butterfly Servo Position
 int air_butterfly_position;
+
 
 //Drive Reset
 unsigned long last_drive_reset = 0;
