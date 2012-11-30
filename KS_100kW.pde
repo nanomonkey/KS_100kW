@@ -561,7 +561,7 @@ void setup() {
   InitDriveReset();
   
   TransitionEngine(ENGINE_ON); //default to engine on. if PCU resets, don't shut a running engine off. in the ENGINE_ON state, should detect and transition out of engine on.
-  TransitionLambda(LAMBDA_POT_CONTROL);
+  TransitionLambda(LAMBDA_P_COMB);
   TransitionDisplay(DISPLAY_SPLASH);
   
   TransitionAshOut(ASHOUT_STOPPED);

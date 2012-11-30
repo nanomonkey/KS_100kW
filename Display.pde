@@ -290,7 +290,8 @@ void DoDisplay() {
     sprintf(buf, "I     %3i", int(ceil(pressure_PID.GetI_Param())));
     Disp_PutStr(buf);
     Disp_RC(2,0);
-    Disp_PutStr("                    ");
+    sprintf(buf, "PIDout:%4i", int(pressure_output));
+    Disp_PutStr(buf);
     switch (cur_item) {
     case 1: // Pressure_PID setpoint
       if (key == 2) {

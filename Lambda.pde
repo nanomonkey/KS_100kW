@@ -2,15 +2,16 @@
 void InitLambda() {
   //LoadLambda();
   LoadPressurePID();
-  if (PID_Control == 0){
-  lambda_state = LAMBDA_POT_CONTROL; 
-  } else {
+//  if (PID_Control == 0){
+//  lambda_state = LAMBDA_POT_CONTROL; 
+//  } else {
     lambda_state = LAMBDA_P_COMB;
-  }
+//  }
 }
 
 void DoLambda() {
     lambda_input = GetLambda();
+    pressure_input = GetPressure_Input();
     switch(lambda_state) {
       case LAMBDA_CLOSEDLOOP:
         //don't reset changed PID values
@@ -70,7 +71,6 @@ void DoLambda() {
         Servo_Mixture.write(air_butterfly_position);
         break;
       case LAMBDA_P_COMB:
-        pressure_input = Press[P_COMB];
         pressure_PID.Compute();
         Servo_Mixture.write(pressure_output);
         break;
@@ -150,6 +150,10 @@ void TransitionLambda(int new_state) {
     
 double GetLambda() {
   return analogRead(ANA_EO2)/1024.0+0.5; //0-5V = 0.5 - 1.5 L;
+}
+
+double GetPressure_Input() {
+  return double(Press[P_COMB]);
 }
 
 void SetPremixServoAngle(double percent) {
