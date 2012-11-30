@@ -18,11 +18,11 @@
 #include <avr/io.h>         // advanced: provides port definitions for the microcontroller (ATmega1280, http://www.atmel.com/dyn/resources/prod_documents/doc2549.PDF)   
 #include <SD.h>
 
-#include <Canbus.h>
-#include <defaults.h>
-#include <global.h>
-#include <mcp2515.h>
-#include <mcp2515_defs.h>
+//#include <Canbus.h>
+//#include <defaults.h>
+//#include <global.h>
+//#include <mcp2515.h>
+//#include <mcp2515_defs.h>
 
 //constant definitions
 #define ABSENT -500
@@ -497,6 +497,7 @@ char float_buf[15] = "";
 //CANbus 
 char can_data_file_name[] = "can00001.txt";
 boolean can_init = false; 
+char hex_buf[20] = "";
 
 void setup() {
   GCU_Setup(V3,FULLFILL,P777722);
@@ -534,6 +535,7 @@ void setup() {
   Serial.begin(57600);
   InitSD();
   LoadServo();
+  InitRS232();
 
   Disp_Init();
   Kpd_Init();
@@ -601,7 +603,7 @@ void loop() {
     }
     DoKeyInput();
     DoHeartBeat(); // blink heartbeat LED
-
+    
     if (millis() >= nextTime2) {
       nextTime2 += loopPeriod2;
       DoDisplay();
@@ -611,6 +613,7 @@ void loop() {
           DoFilter();
           DoDatalogging();
           DoAlarmUpdate();
+          getFuel();
         }
         if (millis() >= nextTime0) {
           if (testing_state == TESTING_OFF) {

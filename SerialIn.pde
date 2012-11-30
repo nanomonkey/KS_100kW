@@ -119,9 +119,6 @@ void DoSerialIn() {
     case 'e':
       TransitionEngine(ENGINE_GOV_TUNING);
       break; 
-    case 'x':
-      testSD();
-      break;
     case 'R': //R0; turns Relay 0 on.
       relayNum = SerialReadInt();
       if (relayNum >= 0 and relayNum < 8){
@@ -137,7 +134,7 @@ void DoSerialIn() {
       }
       break;
     case 'C':
-      logCANbus();
+//      logCANbus();
       break;
     }
   }
@@ -174,4 +171,10 @@ void PrintLambdaUpdate(double P, double I, double D, double nP, double nI, doubl
   Serial.print(nD);
   Serial.println("]");
 }
+
+
+
+
+
+
 
