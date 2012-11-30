@@ -309,7 +309,7 @@ double pressure_setpoint;
 double pressure_input;
 double pressure_output;
 double pressure_value;
-double pressure_setpoint_mode[1] = {1.05};
+//double pressure_setpoint_mode[1] = {1.05};
 double pressure_P[1] = {13.0}; //Adjust P_Param to get more aggressive or conservative control, change sign if moving in the wrong direction
 double pressure_I[1] = {100.0}; //Make I_Param about the same as your manual response time (in Seconds)/4 
 double pressure_D[1] = {0.0}; //Unless you know what it's for, don't use D

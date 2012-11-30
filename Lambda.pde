@@ -131,7 +131,7 @@ void TransitionLambda(int new_state) {
     case LAMBDA_P_COMB:
       lambda_state_name = "Combustion Pressure Setpoint";
       pressure_PID.SetMode(AUTO);
-      //pressure_PID.SetInputLimits(0.0, 5.0);
+      pressure_PID.SetInputLimits(-7000.00, 7000.0);
       pressure_PID.SetOutputLimits(throttle_valve_closed,throttle_valve_open);
       pressure_PID.SetTunings(pressure_P[0], pressure_I[0], pressure_D[0]);
       //SetPremixServoAngle(
@@ -204,13 +204,13 @@ void WritePressurePID() {
 }
 
 void WritePressurePID(double setpoint) {
-  int val,p,i;
-  p = constrain(pressure_PID.GetP_Param(),0,255);
-  i = constrain(pressure_PID.GetI_Param(),0,255);
-  pressure_setpoint_mode[0] = setpoint;
-  val = constrain(setpoint,0,255);
+  int p,i;
+  p = constrain(pressure_PID.GetP_Param()*50,0,255);
+  i = constrain(pressure_PID.GetI_Param()*5,0,255);
+  //pressure_setpoint_mode[0] = setpoint;
+  //val = constrain(setpoint,0,255);
   EEPROM.write(112,128); //check point
-  EEPROM.write(113, val);
+  //EEPROM.write(113, val);
   EEPROM.write(114, p);
   EEPROM.write(115, i);
   Serial.println("#Writing pressure_pid settings to EEPROM");
@@ -218,20 +218,20 @@ void WritePressurePID(double setpoint) {
 
 void LoadPressurePID() {
   byte check;
-  double val,p,i;
+  double p,i;
   check = EEPROM.read(112); 
-  val = EEPROM.read(113);
-  p = EEPROM.read(114);
-  i = EEPROM.read(115);
+  //val = EEPROM.read(113);
+  p = EEPROM.read(114)*.02;
+  i = EEPROM.read(115)*.2;
   if (check == 128) { //check to see if lambda has been set
     Serial.println("#Loading pressure_PID values from EEPROM");
-    pressure_setpoint = val;
+    //pressure_setpoint = val;
     pressure_PID.SetTunings(p,i,0);
   } else {
     Serial.println("#Saving default pressure_PID values to EEPROM");
-    val = pressure_setpoint_mode[0];
-    WritePressurePID(val);
+    //val = pressure_setpoint_mode[0];
+    WritePressurePID(pressure_setpoint);
   }
-  pressure_setpoint = val;
-  pressure_setpoint_mode[0] = val;
+  //pressure_setpoint = val;
+  //pressure_setpoint_mode[0] = val;
 }
