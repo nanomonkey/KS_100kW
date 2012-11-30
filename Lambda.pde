@@ -1,10 +1,10 @@
 // Lambda
 void InitLambda() {
   //LoadLambda();
+  LoadPressurePID();
   if (PID_Control == 0){
   lambda_state = LAMBDA_POT_CONTROL; 
   } else {
-    LoadPressurePID();
     lambda_state = LAMBDA_P_COMB;
   }
 }
@@ -196,15 +196,15 @@ void LoadLambda() {
 
 //PressurePID 
 void WritePressurePID() {
-  WritePressurePID(lambda_setpoint);
+  WritePressurePID(pressure_setpoint);
 }
 
 void WritePressurePID(double setpoint) {
   int val,p,i;
-  p = constrain(pressure_PID.GetP_Param()*100,0,255);
-  i = constrain(pressure_PID.GetI_Param()*10,0,255);
+  p = constrain(pressure_PID.GetP_Param(),0,255);
+  i = constrain(pressure_PID.GetI_Param(),0,255);
   pressure_setpoint_mode[0] = setpoint;
-  val = constrain(128+(setpoint-1.0)*100,0,255);
+  val = constrain(setpoint,0,255);
   EEPROM.write(112,128); //check point
   EEPROM.write(113, val);
   EEPROM.write(114, p);
@@ -216,15 +216,15 @@ void LoadPressurePID() {
   byte check;
   double val,p,i;
   check = EEPROM.read(112); 
-  val = 1.0+(EEPROM.read(113)-128)*0.01;
-  p = EEPROM.read(114)*0.01;
-  i = EEPROM.read(115)*0.1;
-  if (check == 128 && val >= 0.5 && val <= 1.5) { //check to see if lambda has been set
-    Serial.println("#Loading lambda from EEPROM");
+  val = EEPROM.read(113);
+  p = EEPROM.read(114);
+  i = EEPROM.read(115);
+  if (check == 128) { //check to see if lambda has been set
+    Serial.println("#Loading pressure_PID values from EEPROM");
     pressure_setpoint = val;
     pressure_PID.SetTunings(p,i,0);
   } else {
-    Serial.println("#Saving default lambda setpoint to EEPROM");
+    Serial.println("#Saving default pressure_PID values to EEPROM");
     val = pressure_setpoint_mode[0];
     WritePressurePID(val);
   }

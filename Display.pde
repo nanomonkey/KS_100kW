@@ -277,28 +277,28 @@ void DoDisplay() {
     pP=pressure_PID.GetP_Param();
     pI=pressure_PID.GetI_Param();
     Disp_RC(0,0);
-    sprintf(buf, "PcomSet%3i", int(ceil(pressure_setpoint*100.0)));
+    sprintf(buf, "PcSet%4i  ", int(pressure_setpoint));
     Disp_PutStr(buf);
     Disp_RC(0,11);
-    sprintf(buf, "Pcomb%3i", int(pressure_input*100.0));
+    sprintf(buf, "Pcomb%4i", int(pressure_input));
     Disp_PutStr(buf);
     //Row 1
     Disp_RC(1,0);
-    sprintf(buf, "P     %3i  ", int(ceil(pressure_PID.GetP_Param()*100.0)));
+    sprintf(buf, "P     %3i  ", int(ceil(pressure_PID.GetP_Param())));
     Disp_PutStr(buf);
     Disp_RC(1,11);
-    sprintf(buf, "I     %3i", int(ceil(pressure_PID.GetI_Param()*100.0)));
+    sprintf(buf, "I     %3i", int(ceil(pressure_PID.GetI_Param())));
     Disp_PutStr(buf);
     Disp_RC(2,0);
     Disp_PutStr("                    ");
     switch (cur_item) {
     case 1: // Pressure_PID setpoint
       if (key == 2) {
-        pressure_setpoint += 0.01;
+        pressure_setpoint += 1;
         WritePressurePID();
       }
       if (key == 3) {
-        pressure_setpoint -= 0.01;
+        pressure_setpoint -= 1;
         WritePressurePID();
       }          
       Disp_RC(0,0);
@@ -314,11 +314,11 @@ void DoDisplay() {
       break;
     case 3: //Pressure_PID P
       if (key == 2) {
-        pP += 0.01;
+        pP += 1;
         WritePressurePID();
       }
       if (key == 3) {
-        pP -= 0.01;
+        pP -= 1;
         WritePressurePID();
       }
       pressure_PID.SetTunings(pP,pI,0);
@@ -329,11 +329,11 @@ void DoDisplay() {
       break;
     case 4: //Pressure_PID I
       if (key == 2) {
-        pI += 0.1;
+        pI += 1;
         WritePressurePID();
       }
       if (key == 3) {
-        pI -= 0.1;
+        pI -= 1;
         WritePressurePID();
       }
       pressure_PID.SetTunings(pP,pI,0);

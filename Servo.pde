@@ -13,11 +13,11 @@ void InitServos() {
 
 
 void LoadServo() {
-  servo_min = EEPROM.read(23);
+  servo_min = EEPROM.read(22);
   if (servo_min != 255) {  //if EEPROM in default value, then default to 133
     throttle_valve_closed = int(servo_min);
   }
-  servo_max = EEPROM.read(22);
+  servo_max = EEPROM.read(23);
   if (servo_max != 255) { //if EEPROM in default value, then default to 68
     throttle_valve_open = int(servo_max);
   } 
@@ -29,8 +29,8 @@ void WriteServo(){
     servo_min = throttle_valve_closed;
     Serial.println("#Writing Servo Min position setting to EEPROM");
   }
-  if (servo_max != premix_valve_open){
-    EEPROM.write(23,premix_valve_open);
+  if (servo_max != throttle_valve_open){
+    EEPROM.write(23,throttle_valve_open);
     servo_max = throttle_valve_open;
     Serial.println("#Writing Servo Max position setting to EEPROM");
   }

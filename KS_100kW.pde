@@ -169,8 +169,8 @@ String display_string = "";
 int config_var;
 byte config_changed = false;
 static char *Configuration[] = { "CANbus speed   ", "PR_LOW (.01)   ", "PR_HIGH (.01)  ", "Servo Control  " };  //15 character Display prompt
-static char *Config_Choices[] = {"+5   -5 ","+1  -1  ","+1  -1  ", "POT PID "}; //8 char options for last two buttons
-int defaults[] = {100,90,30,0};  //default values to be saved to EEPROM for the following getConfig variables
+static char *Config_Choices[] = {"+5   -5 ","+    -  ","+    -  ", "POT PID "}; //8 char options for last two buttons
+int defaults[] = {50,90,30,0};  //default values to be saved to EEPROM for the following getConfig variables
 int config_min[] = {0,70, 9, 0};  //minimum values allowed 
 int config_max[] = {254,99, 69, 254}; //maximum values allowed  
 
@@ -310,8 +310,8 @@ double pressure_input;
 double pressure_output;
 double pressure_value;
 double pressure_setpoint_mode[1] = {1.05};
-double pressure_P[1] = {0.13}; //Adjust P_Param to get more aggressive or conservative control, change sign if moving in the wrong direction
-double pressure_I[1] = {1.0}; //Make I_Param about the same as your manual response time (in Seconds)/4 
+double pressure_P[1] = {13.0}; //Adjust P_Param to get more aggressive or conservative control, change sign if moving in the wrong direction
+double pressure_I[1] = {100.0}; //Make I_Param about the same as your manual response time (in Seconds)/4 
 double pressure_D[1] = {0.0}; //Unless you know what it's for, don't use D
 PID pressure_PID(&pressure_input, &pressure_output, &pressure_setpoint,pressure_P[0],pressure_I[0],pressure_D[0]);
 unsigned long pressure_updated_time;
