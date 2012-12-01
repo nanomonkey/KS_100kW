@@ -612,7 +612,7 @@ void loop() {
           DoFilter();
           //DoDatalogging();
           DoAlarmUpdate();
-          getFuel();
+          //getFuel();
         }
         if (millis() >= nextTime0) {
           if (testing_state == TESTING_OFF) {

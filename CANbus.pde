@@ -101,7 +101,7 @@ void ReadRS232(){
 void SendRS232(long PGN){
   char hex[6] = "";
   char hex2[8];
-  sprintf(hex, "%6X", PGN);
+  sprintf(hex, "%06X", PGN);
   hex2[0] = toupper(hex[4]);
   hex2[1] = toupper(hex[5]);
   hex2[2] = ' ';
@@ -117,8 +117,6 @@ void SendRS232(long PGN){
   Serial.println(hex2);
   Serial2.println(hex2);
 }
-
-#define PGN65203 0x00FEB3
 
 void getFuel(){
   //  unsigned long logtime;

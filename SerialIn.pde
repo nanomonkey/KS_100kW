@@ -140,7 +140,6 @@ void DoSerialIn() {
       long pgn;
       pgn = SerialReadLong();
       if (pgn > 0){
-        Serial.print("# Sending PGN: "); Serial.print(pgn); Serial.print(", HEX("); Serial.println(pgn, HEX);
         SendRS232(pgn);
       }
       ReadRS232();
