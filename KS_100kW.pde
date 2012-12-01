@@ -116,8 +116,6 @@ unsigned long ash_on = 0;
 #define ENGINE_STARTING 2
 #define ENGINE_GOV_TUNING 3
 
-//Lambda
-#define LAMBDA_SIGNAL_CHECK TRUE
 
 //Flare States
 #define FLARE_OFF 0
@@ -126,20 +124,16 @@ unsigned long ash_on = 0;
 #define FLARE_HIGH 3
 #define FLARE_MAX 4
 
-//Lambda States
-#define LAMBDA_CLOSEDLOOP 0
-#define LAMBDA_SEALED 1
-#define LAMBDA_STEPTEST 2
-#define LAMBDA_SPSTEPTEST 3
-#define LAMBDA_POT_CONTROL 4
-#define LAMBDA_P_COMB 5
+//FUEL_PID States
+#define FUEL_POT_CONTROL 4
+#define FUEL_P_COMB 5
 
 //Display States
 #define DISPLAY_SPLASH 0
 #define DISPLAY_REACTOR 1
 #define DISPLAY_ENGINE 2
 #define DISPLAY_TEST 3
-#define DISPLAY_LAMBDA 4
+#define DISPLAY_FUEL_PID 4
 #define DISPLAY_PRESSURE_PID 5
 #define DISPLAY_GRATE 6
 #define DISPLAY_TESTING 7
@@ -320,26 +314,27 @@ String pressure_state_name;
 int pressure_state;
 unsigned long pressure_state_entered;
 
-// Lambda variables
+// Fuel PID variables
+double fuel_input;
 double premix_valve_open = 133; 
 double premix_valve_closed = 68;
 double premix_valve_max = 1.0;  //minimum of range for closed loop operation (percent open)
 double premix_valve_min = 0.00; //maximum of range for closed loop operation (percent open)
 double premix_valve_center = 0.00; //initial value when entering closed loop operation (percent open)
-double lambda_setpoint;
-double lambda_input;
-double lambda_output;
-double lambda_value;
-double lambda_setpoint_mode[1] = {1.05};
-double lambda_P[1] = {0.13}; //Adjust P_Param to get more aggressive or conservative control, change sign if moving in the wrong direction
-double lambda_I[1] = {1.0}; //Make I_Param about the same as your manual response time (in Seconds)/4 
-double lambda_D[1] = {0.0}; //Unless you know what it's for, don't use D
-PID lambda_PID(&lambda_input, &lambda_output, &lambda_setpoint,lambda_P[0],lambda_I[0],lambda_D[0]);
+double FUEL_PID_setpoint;
+double FUEL_PID_input;
+double FUEL_PID_output;
+double FUEL_PID_value;
+double FUEL_PID_setpoint_mode[1] = {1.05};
+double FUEL_PID_P[1] = {0.13}; //Adjust P_Param to get more aggressive or conservative control, change sign if moving in the wrong direction
+double FUEL_PID_I[1] = {1.0}; //Make I_Param about the same as your manual response time (in Seconds)/4 
+double FUEL_PID_D[1] = {0.0}; //Unless you know what it's for, don't use D
+PID FUEL_PID(&FUEL_PID_input, &FUEL_PID_output, &FUEL_PID_setpoint,FUEL_PID_P[0],FUEL_PID_I[0],FUEL_PID_D[0]);
 unsigned long lamba_updated_time;
-boolean write_lambda = false;
-String lambda_state_name;
-int lambda_state;
-unsigned long lambda_state_entered;
+boolean write_FUEL_PID = false;
+String FUEL_PID_state_name;
+int FUEL_PID_state;
+unsigned long FUEL_PID_state_entered;
 
 ////Governor
 //double governor_setpoint;
@@ -530,7 +525,7 @@ void setup() {
   nextTime3 = millis() + loopPeriod3;
   
   LoadPressureSensorCalibration();
-  //LoadLambda(); - must save lambda data first?
+  //LoadFuel(); - must save Fuel data first?
   Serial.begin(57600);
   //InitSD();
   LoadServo();
@@ -556,13 +551,13 @@ void setup() {
   //Servo_Reset();
   Timer_Reset();
   
-  InitLambda();
+  InitFUEL_PID();
   InitServos();
   InitGrate();  
   InitDriveReset();
   
   TransitionEngine(ENGINE_ON); //default to engine on. if PCU resets, don't shut a running engine off. in the ENGINE_ON state, should detect and transition out of engine on.
-  TransitionLambda(LAMBDA_P_COMB);
+  //TransitionFUEL_PID(FUEL_P_COMB);
   TransitionDisplay(DISPLAY_SPLASH);
   
   TransitionAshOut(ASHOUT_STOPPED);
@@ -584,7 +579,7 @@ void loop() {
       DoPressure();
       DoSerialIn();
       //ReadRS232();
-      DoLambda();
+      DoFUEL_PID();
       //DoGovernor();
       DoAuger();
       DoRotaryValve();
@@ -613,7 +608,7 @@ void loop() {
           DoFilter();
           //DoDatalogging();
           DoAlarmUpdate();
-          //getFuel();
+          //getFUEL_PID();
         }
         if (millis() >= nextTime0) {
           if (testing_state == TESTING_OFF) {

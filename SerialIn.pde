@@ -2,48 +2,48 @@
 void DoSerialIn() {
   //int incomingByte = 0;
    int relayNum;
-   PID &v_PID = lambda_PID;
-   double p,i,d;
-    double p_d =0.02;
-    double i_d = 0.02;
-    double d_d = 0.02;
+//   PID &v_PID = lambda_PID;
+//   double p,i,d;
+//    double p_d =0.02;
+//    double i_d = 0.02;
+//    double d_d = 0.02;
   // Serial input
   if (Serial.available() > 0) {
-    p=v_PID.GetP_Param();
-    i=v_PID.GetI_Param();
-    d=v_PID.GetD_Param();
+//    p=v_PID.GetP_Param();
+//    i=v_PID.GetI_Param();
+//    d=v_PID.GetD_Param();
     serial_last_input = Serial.read();
     switch (serial_last_input) {
-    case 'p':
-      PrintLambdaUpdate(p,i,d,p+p_d,i,d);
-      p=p+p_d;
-      v_PID.SetTunings(p,i,d);
-      break;
-    case 'P':
-      PrintLambdaUpdate(p,i,d,p-p_d,i,d);
-      p=p-p_d;
-      v_PID.SetTunings(p,i,d);
-      break;
-    case 'i':
-      PrintLambdaUpdate(p,i,d,p,i+i_d,d);
-      i=i+i_d;
-      v_PID.SetTunings(p,i,d);
-      break;
-    case 'I':
-      PrintLambdaUpdate(p,i,d,p,i-i_d,d);
-      i=i-i_d;
-      v_PID.SetTunings(p,i,d);
-      break;
-    case 'd':
-      PrintLambdaUpdate(p,i,d,p,i,d+d_d);
-      d=d+d_d;
-      v_PID.SetTunings(p,i,d);
-      break;
-    case 'D':
-      PrintLambdaUpdate(p,i,d,p,i,d-d_d);
-      d=d-d_d;
-      v_PID.SetTunings(p,i,d);
-      break;
+//    case 'p':
+//      PrintLambdaUpdate(p,i,d,p+p_d,i,d);
+//      p=p+p_d;
+//      v_PID.SetTunings(p,i,d);
+//      break;
+//    case 'P':
+//      PrintLambdaUpdate(p,i,d,p-p_d,i,d);
+//      p=p-p_d;
+//      v_PID.SetTunings(p,i,d);
+//      break;
+//    case 'i':
+//      PrintLambdaUpdate(p,i,d,p,i+i_d,d);
+//      i=i+i_d;
+//      v_PID.SetTunings(p,i,d);
+//      break;
+//    case 'I':
+//      PrintLambdaUpdate(p,i,d,p,i-i_d,d);
+//      i=i-i_d;
+//      v_PID.SetTunings(p,i,d);
+//      break;
+//    case 'd':
+//      PrintLambdaUpdate(p,i,d,p,i,d+d_d);
+//      d=d+d_d;
+//      v_PID.SetTunings(p,i,d);
+//      break;
+//    case 'D':
+//      PrintLambdaUpdate(p,i,d,p,i,d-d_d);
+//      d=d-d_d;
+//      v_PID.SetTunings(p,i,d);
+//      break;
     case 'c':
       CalibratePressureSensors();
       LoadPressureSensorCalibration();
@@ -58,18 +58,18 @@ void DoSerialIn() {
       Serial.print("#Servo1 (degrees) now:");
       Serial.println(Servo_Calib.read());
       break;
-    case 'l':
-      lambda_setpoint += 0.01;
-      Serial.print("#Lambda Setpoint now:");
-      Serial.println(lambda_setpoint);
-      WriteLambda();
-      break;
-    case 'L':
-      lambda_setpoint -= 0.01;
-      Serial.print("#Lambda Setpoint now:");
-      Serial.println(lambda_setpoint);
-      WriteLambda();
-      break;
+//    case 'l':
+//      lambda_setpoint += 0.01;
+//      Serial.print("#Lambda Setpoint now:");
+//      Serial.println(lambda_setpoint);
+//      WriteLambda();
+//      break;
+//    case 'L':
+//      lambda_setpoint -= 0.01;
+//      Serial.print("#Lambda Setpoint now:");
+//      Serial.println(lambda_setpoint);
+//      WriteLambda();
+//      break;
     case 't':
       loopPeriod1 = min(loopPeriod1+100,loopPeriod2);
       Serial.print("#Sample Period now:");
@@ -179,21 +179,21 @@ long SerialReadLong(){
 }
     
 
-void PrintLambdaUpdate(double P, double I, double D, double nP, double nI, double nD) {
-  Serial.print("#Updating PID from [");
-  Serial.print(P);
-  Serial.print(",");
-  Serial.print(I);
-  Serial.print(",");
-  Serial.print(D);
-  Serial.print("] to [");
-  Serial.print(nP);
-  Serial.print(",");
-  Serial.print(nI);
-  Serial.print(",");
-  Serial.print(nD);
-  Serial.println("]");
-}
+//void PrintLambdaUpdate(double P, double I, double D, double nP, double nI, double nD) {
+//  Serial.print("#Updating PID from [");
+//  Serial.print(P);
+//  Serial.print(",");
+//  Serial.print(I);
+//  Serial.print(",");
+//  Serial.print(D);
+//  Serial.print("] to [");
+//  Serial.print(nP);
+//  Serial.print(",");
+//  Serial.print(nI);
+//  Serial.print(",");
+//  Serial.print(nD);
+//  Serial.println("]");
+//}
 
 
 

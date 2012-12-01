@@ -197,72 +197,72 @@ void DoDisplay() {
       Disp_PutStr("NEXT                ");
     }
     break;
-  case DISPLAY_LAMBDA:
+  case DISPLAY_FUEL_PID:
     double P,I;
     item_count = 4;
-    P=lambda_PID.GetP_Param();
-    I=lambda_PID.GetI_Param();
+    P=FUEL_PID.GetP_Param();
+    I=FUEL_PID.GetI_Param();
     Disp_RC(0,0);
-    sprintf(buf, "LamSet%3i  ", int(ceil(lambda_setpoint*100.0)));
+    sprintf(buf, "FuelSet%3i  ", int(ceil(FUEL_PID_setpoint*100.0)));
     Disp_PutStr(buf);
     Disp_RC(0,11);
-    sprintf(buf, "Lambda%3i", int(lambda_input*100.0));
+    sprintf(buf, "Fuel%3i", int(FUEL_PID_input*100.0));
     Disp_PutStr(buf);
     //Row 1
     Disp_RC(1,0);
-    sprintf(buf, "P     %3i  ", int(ceil(lambda_PID.GetP_Param()*100.0)));
+    sprintf(buf, "P     %3i  ", int(ceil(FUEL_PID.GetP_Param()*100.0)));
     Disp_PutStr(buf);
     Disp_RC(1,11);
-    sprintf(buf, "I     %3i", int(ceil(lambda_PID.GetI_Param()*100.0)));
+    sprintf(buf, "I     %3i", int(ceil(FUEL_PID.GetI_Param()*100.0)));
     Disp_PutStr(buf);
     Disp_RC(2,0);
     Disp_PutStr("                    ");
     switch (cur_item) {
-    case 1: // Lambda setpoint
+    case 1: // FUEL_PID setpoint
       if (key == 2) {
-        lambda_setpoint += 0.01;
-        WriteLambda();
+        FUEL_PID_setpoint += 0.01;
+        WriteFUEL_PID();
       }
       if (key == 3) {
-        lambda_setpoint -= 0.01;
-        WriteLambda();
+        FUEL_PID_setpoint -= 0.01;
+        WriteFUEL_PID();
       }          
       Disp_RC(0,0);
       Disp_CursOn();
       Disp_RC(3,0);
       Disp_PutStr("NEXT  ADV   +    -  ");
       break;
-    case 2: //Lambda reading
+    case 2: //FUEL_PID reading
       Disp_RC(3,0);
       Disp_PutStr("NEXT  ADV           ");
       Disp_RC(0,11);
       Disp_CursOn();
       break;
-    case 3: //Lambda P
+    case 3: //FUEL_PID P
       if (key == 2) {
         P += 0.01;
-        WriteLambda();
+        WriteFUEL_PID();
       }
       if (key == 3) {
         P -= 0.01;
-        WriteLambda();
+        WriteFUEL_PID();
       }
-      lambda_PID.SetTunings(P,I,0);
+      FUEL_PID.SetTunings(P,I,0);
       Disp_RC(3,0);
       Disp_PutStr("NEXT  ADV   +    -  ");
       Disp_RC(1,0);
       Disp_CursOn();
       break;
-    case 4: //Lambda I
+    case 4: //FUEL_PID I
       if (key == 2) {
         I += 0.1;
-        WriteLambda();
+        WriteFUEL_PID();
       }
       if (key == 3) {
         I -= 0.1;
-        WriteLambda();
+        WriteFUEL_PID();
       }
-      lambda_PID.SetTunings(P,I,0);
+      FUEL_PID.SetTunings(P,I,0);
       Disp_RC(3,0);
       Disp_PutStr("NEXT  ADV   +    -  ");
       Disp_RC(1,11);
@@ -583,7 +583,7 @@ void TransitionDisplay(int new_state) {
     break;
   case DISPLAY_ENGINE:
     break;
-  case DISPLAY_LAMBDA:
+  case DISPLAY_FUEL_PID:
     cur_item = 1;
     break;
   case DISPLAY_PRESSURE_PID:
@@ -618,12 +618,12 @@ void DoKeyInput() {
       TransitionDisplay(DISPLAY_REACTOR);
       break;
     case DISPLAY_REACTOR:
-      TransitionDisplay(DISPLAY_LAMBDA);
+      TransitionDisplay(DISPLAY_FUEL_PID);
       break;
     case DISPLAY_ENGINE:
       TransitionDisplay(DISPLAY_REACTOR);
       break;
-    case DISPLAY_LAMBDA:
+    case DISPLAY_FUEL_PID:
       TransitionDisplay(DISPLAY_PRESSURE_PID);
       break;
     case DISPLAY_PRESSURE_PID:
@@ -818,6 +818,7 @@ void update_config_var(int var_num){
       break;
     case 4:
       PID_Control = getConfig(4);
+      InitFUEL_PID();
       break;
   }
 }
