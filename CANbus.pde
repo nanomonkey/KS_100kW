@@ -47,12 +47,12 @@
 //  if (Canbus.ecu_req(0xFEE9,buffer) == 1){   
 //    Serial.print("#PGN 65257: "); Serial.println(buffer);
 //  }
-  
-  /*
+
+/*
  Engine Speed is in PGN 61444(0xF004).  It is two bytes long with a resolution of .125 rpm/bit, bytes 4 and 5. Byte 3 of that PGN is the percent engine torque of the engine.
  PGN 65203(0xFEB3) has a parameter called trip fuel rate in .05 L/hour. It is the fifth and sixth bytes.  
  PGN 65257(0xFEE9) has two separate parameters total fuel consumption and trip fuel consumption both are .5L/ bit.  Trip fuel consumption is bytes 1-4 and Total Fuel Consumption is bytes 5-8.  
-*/
+ */
 //}
 
 //void sendCANbus(&message, boolean J1939){
@@ -64,45 +64,70 @@
 //}
 
 
+
+// CANbus via 
 void InitRS232(){
   Serial.println("# Initializing RS232");
   Serial2.begin(38400);
+  Serial2.println("ATI");
+  ReadRS232();
 }
 
 void ReadRS232(){
   byte readbyte;
-  char readStream[128] = "";
+  char readStream[129] = "";
   int i = 0;
-  Serial.print("# RS232: ");
+
   while (Serial2.available() > 0){
     readbyte = Serial2.read();
-    readStream[i] = readbyte;
-    i++;
-    Serial.print(readbyte);
     if (i == 128) break;
     if (readbyte == '\n') break; 
     if (readbyte == -1) continue;
+    if (readbyte == '>') continue; //removes > character
+    if (i==0){
+      Serial.print("# RS232: ");
+    }
+    readStream[i] = readbyte;
+    readStream[i+1] = '\0';
+    Serial.print(readbyte);
+    i += 1;
   }
   Serial.println();
-  Serial.print("#readStream: "); Serial.println(readStream);
+  //Serial.print("#readStream: "); Serial.println(readStream);
 }
+
+
 
 void SendRS232(long PGN){
-  sprintf(hex_buf, "%3X", PGN);
-  Serial.print("Sending: "); Serial.print(hex_buf); Serial.print(", "); Serial.println(PGN);
-  Serial2.println(hex_buf);
+  char hex[6] = "";
+  char hex2[8];
+  sprintf(hex, "%6X", PGN);
+  hex2[0] = toupper(hex[4]);
+  hex2[1] = toupper(hex[5]);
+  hex2[2] = ' ';
+  hex2[3] = toupper(hex[2]);
+  hex2[4] = toupper(hex[3]);
+  hex2[5] = ' ';
+  hex2[6] = toupper(hex[0]);
+  hex2[7] = toupper(hex[1]);
+  hex2[8]='\0';
+  Serial.print("Sending PGN: "); 
+  Serial.print(PGN); 
+  Serial.print(", "); 
+  Serial.println(hex2);
+  Serial2.println(hex2);
 }
+
+#define PGN65203 0x00FEB3
 
 void getFuel(){
-  unsigned long logtime;
+  //  unsigned long logtime;
   SendRS232(65203);
-  logtime = millis();
-  while (millis() - logtime < 1000){
-    ReadRS232();
-  }
-  SendRS232(65203);
+  // logtime = millis();
+  //  while (millis() - logtime < 1000){
+  ReadRS232();
+  // }
+  //SendRS232(65203);
 }
 
- 
-  
-  
+

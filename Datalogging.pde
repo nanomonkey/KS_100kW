@@ -383,9 +383,9 @@ void DoDatalogging() {
   LogEngine(header);  //update when we know more from Cummins
   LogFuelFeed(header);
   Serial.println(data_buffer);
-//  if (sd_loaded){
-//    DatalogSD(data_buffer, sd_data_file_name);
-//  }
+  if (sd_loaded){
+    DatalogSD(data_buffer, sd_data_file_name);
+  }
   lineCount++;
 }
 

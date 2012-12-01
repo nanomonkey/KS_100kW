@@ -497,7 +497,6 @@ char float_buf[15] = "";
 //CANbus 
 char can_data_file_name[] = "can00001.txt";
 boolean can_init = false; 
-char hex_buf[20] = "";
 
 void setup() {
   GCU_Setup(V3,FULLFILL,P777722);
@@ -611,7 +610,7 @@ void loop() {
         nextTime1 += loopPeriod1;
         if (testing_state == TESTING_OFF) {
           DoFilter();
-          DoDatalogging();
+          //DoDatalogging();
           DoAlarmUpdate();
           getFuel();
         }

@@ -136,6 +136,15 @@ void DoSerialIn() {
     case 'C':
 //      logCANbus();
       break;
+    case '$':  //Send Canbus PGN request, then read CANbus signal
+      long pgn;
+      pgn = SerialReadLong();
+      if (pgn > 0){
+        Serial.print("# Sending PGN: "); Serial.print(pgn); Serial.print(", HEX("); Serial.println(pgn, HEX);
+        SendRS232(pgn);
+      }
+      ReadRS232();
+      break;
     }
   }
 }
@@ -153,6 +162,21 @@ int SerialReadInt(){
     integerValue = ((incomingByte - 48) + integerValue);
   }
   return integerValue;
+}
+    
+long SerialReadLong(){
+  byte incomingByte;
+  long longValue = 0;  
+  while(1) {            
+    incomingByte = Serial.read();
+    if (incomingByte == '\n') break;   // exit the while(1), we're done receiving
+    if (incomingByte == ';') break;
+    if (incomingByte == -1) continue;  // if no characters are in the buffer read() returns -1
+    longValue *= 10;  // shift left 1 decimal place
+    // convert ASCII to integer, add, and shift left 1 decimal place
+    longValue = ((incomingByte - 48) + longValue);
+  }
+  return longValue;
 }
     
 
