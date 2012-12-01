@@ -7,24 +7,24 @@ void LogTime(boolean header = false) {
   }
 }
 
-void LogPID(boolean header = false) {
-  if (header) {
-    PrintColumn("Lambda_In");
-    PrintColumn("Lambda_Out");
-    PrintColumn("Lambda_Setpoint");
-    PrintColumn("Lambda_P");
-    PrintColumn("Lambda_I");
-    PrintColumn("Lambda_D");
-  } 
-  else {
-    PrintColumn(lambda_input);
-    PrintColumn(lambda_output);
-    PrintColumn(lambda_setpoint);
-    PrintColumn(lambda_PID.GetP_Param());
-    PrintColumn(lambda_PID.GetI_Param());
-    PrintColumn(lambda_PID.GetD_Param());
-  }
-}
+//void LogPID(boolean header = false) {
+//  if (header) {
+//    PrintColumn("Lambda_In");
+//    PrintColumn("Lambda_Out");
+//    PrintColumn("Lambda_Setpoint");
+//    PrintColumn("Lambda_P");
+//    PrintColumn("Lambda_I");
+//    PrintColumn("Lambda_D");
+//  } 
+//  else {
+//    PrintColumn(lambda_input);
+//    PrintColumn(lambda_output);
+//    PrintColumn(lambda_setpoint);
+//    PrintColumn(lambda_PID.GetP_Param());
+//    PrintColumn(lambda_PID.GetI_Param());
+//    PrintColumn(lambda_PID.GetD_Param());
+//  }
+//}
 
 void LogAnalogInputs(boolean header = false) {
   if (header) {
@@ -219,22 +219,22 @@ void LogAuger(boolean header = false) {
   }
 }
 
-void LogGovernor(boolean header=false) {
-  if (header) {
-    PrintColumn("ThrottlePercent");
-    PrintColumn("ThrottleAngle");
-    PrintColumn("Gov_P");
-    PrintColumn("Gov_I");
-    PrintColumn("Gov_D");
-  } 
-  else {
-    PrintColumnInt(governor_output);
-    PrintColumnInt(Servo_Throttle.read());
-    PrintColumnInt(governor_PID.GetP_Param());
-    PrintColumnInt(governor_PID.GetI_Param());
-    PrintColumnInt(governor_PID.GetD_Param());
-  }
-}
+//void LogGovernor(boolean header=false) {
+//  if (header) {
+//    PrintColumn("ThrottlePercent");
+//    PrintColumn("ThrottleAngle");
+//    PrintColumn("Gov_P");
+//    PrintColumn("Gov_I");
+//    PrintColumn("Gov_D");
+//  } 
+//  else {
+//    PrintColumnInt(governor_output);
+//    PrintColumnInt(Servo_Throttle.read());
+//    PrintColumnInt(governor_PID.GetP_Param());
+//    PrintColumnInt(governor_PID.GetI_Param());
+//    PrintColumnInt(governor_PID.GetD_Param());
+//  }
+//}
 
 void LogEngine(boolean header=false) {
   if (header) {
@@ -383,9 +383,9 @@ void DoDatalogging() {
   LogEngine(header);  //update when we know more from Cummins
   LogFuelFeed(header);
   Serial.println(data_buffer);
-  if (sd_loaded){
-    DatalogSD(data_buffer, sd_data_file_name);
-  }
+//  if (sd_loaded){
+//    DatalogSD(data_buffer, sd_data_file_name);
+//  }
   lineCount++;
 }
 

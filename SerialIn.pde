@@ -136,13 +136,13 @@ void DoSerialIn() {
     case 'C':
 //      logCANbus();
       break;
-    case '$':  //Send Canbus PGN request, then read CANbus signal
+    case '$':  //Send Canbus PGN request over RS232 Serial2.
       long pgn;
       pgn = SerialReadLong();
       if (pgn > 0){
-        SendRS232(pgn);
+        SendPGN(pgn);
       }
-      ReadRS232();
+      //ReadRS232();
       break;
     }
   }

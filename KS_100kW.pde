@@ -16,7 +16,7 @@
 #include <ui.h>             // part of KSlibs, menu
 #include <util.h>           // part of KSlibs, utility functions, GCU_Setup
 #include <avr/io.h>         // advanced: provides port definitions for the microcontroller (ATmega1280, http://www.atmel.com/dyn/resources/prod_documents/doc2549.PDF)   
-#include <SD.h>
+//#include <SD.h>
 
 //#include <Canbus.h>
 //#include <defaults.h>
@@ -341,15 +341,15 @@ String lambda_state_name;
 int lambda_state;
 unsigned long lambda_state_entered;
 
-//Governor
-double governor_setpoint;
-double governor_input;
-double governor_output;
-double governor_value;
-double governor_P[1] = {2}; //Adjust P_Param to get more aggressive or conservative control, change sign if moving in the wrong direction
-double governor_I[1] = {.2}; //Make I_Param about the same as your manual response time (in Seconds)/4 
-double governor_D[1] = {0.0}; //Unless you know what it's for, don't use D
-PID governor_PID(&governor_input, &governor_output, &governor_setpoint,governor_P[0],governor_I[0],governor_D[0]);
+////Governor
+//double governor_setpoint;
+//double governor_input;
+//double governor_output;
+//double governor_value;
+//double governor_P[1] = {2}; //Adjust P_Param to get more aggressive or conservative control, change sign if moving in the wrong direction
+//double governor_I[1] = {.2}; //Make I_Param about the same as your manual response time (in Seconds)/4 
+//double governor_D[1] = {0.0}; //Unless you know what it's for, don't use D
+//PID governor_PID(&governor_input, &governor_output, &governor_setpoint,governor_P[0],governor_I[0],governor_D[0]);
 
 // Pressure variables
 int Press_Calib[6];
@@ -480,15 +480,15 @@ char* display_alarm[] = {
   "Auger boot unknown "
 }; //20 char message for 4x20 display
 
-// SD Card
-boolean sd_loaded;
-Sd2Card sd_card;
-SdVolume sd_volume;
-SdFile sd_root;
-SdFile sd_file;
-char sd_data_file_name[] = "datalog1.txt";     //Create an array that contains the name of our datalog file, updated upon 
-char sd_in_char=0;
-int sd_index=0;  
+//// SD Card
+//boolean sd_loaded;
+//Sd2Card sd_card;
+//SdVolume sd_volume;
+//SdFile sd_root;
+//SdFile sd_file;
+//char sd_data_file_name[] = "datalog1.txt";     //Create an array that contains the name of our datalog file, updated upon 
+//char sd_in_char=0;
+//int sd_index=0;  
 
 //Datalogging Buffer
 String data_buffer = "";
@@ -532,7 +532,7 @@ void setup() {
   LoadPressureSensorCalibration();
   //LoadLambda(); - must save lambda data first?
   Serial.begin(57600);
-  InitSD();
+  //InitSD();
   LoadServo();
   InitRS232();
 
@@ -583,6 +583,7 @@ void loop() {
       Timer_ReadAll(); // reads pulse timer into Timer_Data, in RPM ??? XXX
       DoPressure();
       DoSerialIn();
+      //ReadRS232();
       DoLambda();
       //DoGovernor();
       DoAuger();

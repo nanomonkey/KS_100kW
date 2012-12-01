@@ -70,18 +70,17 @@ void InitRS232(){
   Serial.println("# Initializing RS232");
   Serial2.begin(38400);
   Serial2.println("ATI");
-  ReadRS232();
 }
 
 void ReadRS232(){
   byte readbyte;
   char readStream[129] = "";
   int i = 0;
-
   while (Serial2.available() > 0){
     readbyte = Serial2.read();
     if (i == 128) break;
     if (readbyte == '\n') break; 
+    if (readbyte == '\0') break; 
     if (readbyte == -1) continue;
     if (readbyte == '>') continue; //removes > character
     if (i==0){
@@ -98,7 +97,7 @@ void ReadRS232(){
 
 
 
-void SendRS232(long PGN){
+void SendPGN(long PGN){
   char hex[6] = "";
   char hex2[8];
   sprintf(hex, "%06X", PGN);
@@ -119,13 +118,7 @@ void SendRS232(long PGN){
 }
 
 void getFuel(){
-  //  unsigned long logtime;
-  SendRS232(65203);
-  // logtime = millis();
-  //  while (millis() - logtime < 1000){
-  ReadRS232();
-  // }
-  //SendRS232(65203);
+  SendPGN(65203);
 }
 
 
