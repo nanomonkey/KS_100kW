@@ -18,7 +18,7 @@ void DoFUEL_PID() {
         break;
       case FUEL_P_COMB:
         FUEL_PID.Compute();
-        SetPremixServoAngle(FUEL_PID_output);
+        pressure_setpoint = FUEL_PID_output;
         pressure_PID.Compute();
         Servo_Mixture.write(pressure_output);
         break;
@@ -120,7 +120,7 @@ void WritePressurePID() {
 
 void WritePressurePID(double setpoint) {
   int p,i;
-  p = constrain(pressure_PID.GetP_Param()*50,0,255);
+  p = constrain(pressure_PID.GetP_Param()*50,0,255);  //use map instead of constrain??  val = map(pressure_PID.GetP_Param(), 0, 1023, 0, 255);
   i = constrain(pressure_PID.GetI_Param()*5,0,255);
   //pressure_setpoint_mode[0] = setpoint;
   //val = constrain(setpoint,0,255);
@@ -136,7 +136,7 @@ void LoadPressurePID() {
   double p,i;
   check = EEPROM.read(112); 
   //val = EEPROM.read(113);
-  p = EEPROM.read(114)*.02;
+  p = EEPROM.read(114)*.02;  //use map instead of constrain??  val = map(pressure_PID.GetP_Param(), 0, 255, 0, 1023);
   i = EEPROM.read(115)*.2;
   if (check == 128) { //check to see if FUEL_PID has been set
     Serial.println("#Loading pressure_PID values from EEPROM");

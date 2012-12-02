@@ -19,7 +19,7 @@ int ReadRS232(){
     if (readbyte == '\n') break; 
     if (readbyte == '\0') break; 
     if (readbyte == -1) continue;
-    if (readbyte == '>') continue; //removes > character
+    if (readbyte == '>') continue; //removes > character, may want to extend this to set i=0, as this is the prompt and beginning of command string.
     if (i==0){
       Serial.print("# RS232: ");
     }
@@ -29,15 +29,13 @@ int ReadRS232(){
     i += 1;
   }
   Serial.println();
-  if (sizeof(readstream[]) > 0){
-    
+  if (i > 0){
+    // Scub value from  readStream
+    int returnbytes[] = {0,0,0,0,0,0,0,0};
+    sscanf(readStream, "%x %x %x %x %x %x %x %x", &returnbytes[0], &returnbytes[1], &returnbytes[3], &returnbytes[4], &returnbytes[5], &returnbytes[6], &returnbytes[7]);  
+    //combine the important bytes
+    returnvalue = float(word(returnbytes[6],(returnbytes[7]))); //not sure how to combine these yet...probably need a seperate bit filter for each.
   }
-  // Scub value from  readStream
-  int returnbytes[] = {0,0,0,0,0,0,0,0};
-  sscanf(readstream, "%x %x %x %x %x %x %x %x", &returnbytes[0], &returnbytes[1], &returnbytes[3], &returnbytes[4], &returnbytes[5], &returnbytes[6], &returnbytes[7],);  
-  //combine the important bytes
-  returnvalue = (returnbytes[6] >> 1)  && (returnbytes[7] >> 1)  //not sure how to combine these yet...probably need a seperate bit filter for each.
-  
   return returnvalue;
 }
 
